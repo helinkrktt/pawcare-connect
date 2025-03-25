@@ -9,6 +9,7 @@ import { HealthTimeline } from "@/components/HealthTimeline";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const samplePets = [
   {
@@ -31,7 +32,7 @@ const samplePets = [
     upcomingVaccines: 2,
     healthStatus: "attention"
   }
-] as const;
+];
 
 const sampleAppointments = [
   {
@@ -45,7 +46,7 @@ const sampleAppointments = [
     status: "upcoming",
     isNext: true
   }
-] as const;
+];
 
 const sampleTimelineEvents = [
   {
@@ -80,7 +81,7 @@ const sampleTimelineEvents = [
     type: "vaccine",
     isPast: false
   }
-] as const;
+];
 
 const Index = () => {
   const demoSectionRef = useRef<HTMLDivElement>(null);
@@ -190,7 +191,7 @@ const Index = () => {
                   <Button variant="outline" size="sm">Tümünü Gör</Button>
                 </div>
                 <div className="p-6">
-                  <HealthTimeline events={sampleTimelineEvents} />
+                  <HealthTimeline events={sampleTimelineEvents as any} />
                 </div>
               </div>
             </div>

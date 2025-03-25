@@ -1,61 +1,78 @@
 
-import { useParams } from 'react-router-dom';
-import { useState } from 'react';
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { HealthTimeline } from "@/components/HealthTimeline";
+import { AppointmentCard } from "@/components/AppointmentCard";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
-import { Heart, Calendar, Weight, Ruler, Cake, PawPrint, Info, Syringe, FilePlus, Edit } from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Plus } from "lucide-react";
 
-const samplePets = [
-  {
+// Sample data
+const samplePets = {
+  "1": {
     id: "1",
     name: "Luna",
     species: "Kedi",
     breed: "British Shorthair",
     age: "3 yaş",
-    gender: "Dişi",
     weight: "4.2 kg",
-    height: "25 cm",
-    birthDate: "10 Mayıs 2020",
+    gender: "Dişi",
+    imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2043&auto=format&fit=crop",
     color: "Gri",
-    microchip: "985121056478523",
-    imageUrl: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
+    birthdate: "10 Mayıs 2020",
+    microchipNumber: "985732164598732",
+    sterilized: true,
+    upcomingVaccines: 1,
     healthStatus: "healthy"
   },
-  {
-    id: "2", 
+  "2": {
+    id: "2",
     name: "Max",
     species: "Köpek",
     breed: "Golden Retriever",
     age: "2 yaş",
-    gender: "Erkek",
     weight: "28.5 kg",
-    height: "58 cm",
-    birthDate: "22 Haziran 2021",
+    gender: "Erkek",
+    imageUrl: "https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&w=1924&auto=format&fit=crop",
     color: "Altın Sarısı",
-    microchip: "985121056478742",
-    imageUrl: "https://images.unsplash.com/photo-1552053831-71594a27632d",
+    birthdate: "23 Haziran 2021",
+    microchipNumber: "985732164598733",
+    sterilized: false,
+    upcomingVaccines: 2,
     healthStatus: "attention"
+  }
+};
+
+const sampleAppointments = [
+  {
+    id: "1",
+    title: "Yıllık Sağlık Kontrolü",
+    date: "15 Mayıs 2023",
+    time: "14:30",
+    location: "Merkez Veteriner Kliniği",
+    petName: "Luna",
+    vetName: "Dr. Ayşe Demir",
+    status: "upcoming",
+    petId: "1",
+    isNext: true
   },
   {
-    id: "3",
-    name: "Oliver",
-    species: "Kedi",
-    breed: "Scottish Fold",
-    age: "1 yaş",
-    gender: "Erkek",
-    weight: "3.8 kg",
-    height: "23 cm",
-    birthDate: "15 Mart 2022",
-    color: "Gri ve Beyaz",
-    microchip: "985121056471234",
-    imageUrl: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-    healthStatus: "healthy"
+    id: "2",
+    title: "Diş Temizliği",
+    date: "22 Mayıs 2023",
+    time: "10:15",
+    location: "Merkez Veteriner Kliniği",
+    petName: "Luna",
+    vetName: "Dr. Mehmet Yılmaz",
+    status: "upcoming",
+    petId: "1",
+    isNext: false
   }
-] as const;
+];
 
 const sampleTimelineEvents = [
   {
@@ -90,279 +107,264 @@ const sampleTimelineEvents = [
     type: "vaccine",
     isPast: false
   }
-] as const;
-
-const sampleAppointments = [
-  {
-    id: "1",
-    title: "Yıllık Sağlık Kontrolü",
-    date: "15 Mayıs 2023",
-    time: "14:30",
-    location: "Merkez Veteriner Kliniği",
-    petName: "Luna",
-    vetName: "Dr. Ayşe Demir",
-    status: "upcoming",
-    isNext: true
-  },
-  {
-    id: "2",
-    title: "Aşı Randevusu",
-    date: "10 Mart 2023",
-    time: "11:30",
-    location: "PetHealth Veteriner Kliniği",
-    petName: "Luna",
-    vetName: "Dr. Emre Yıldız",
-    status: "completed"
-  }
-] as const;
+];
 
 const PetProfile = () => {
-  const { id } = useParams<{ id: string }>();
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const { id } = useParams<{id: string}>();
+  const [activeTab, setActiveTab] = useState("overview");
   
-  // Find the pet by ID
-  const pet = samplePets.find(p => p.id === id) || samplePets[0];
-  
-  // Filter events for this pet (in a real app, this would filter by pet ID)
-  const petEvents = sampleTimelineEvents;
+  // Get pet data based on the ID
+  const pet = samplePets[id as keyof typeof samplePets];
   
   // Filter appointments for this pet
-  const petAppointments = sampleAppointments.filter(a => a.petName === pet.name);
+  const petAppointments = sampleAppointments.filter(appointment => appointment.petId === id);
   
-  const statusColors = {
-    healthy: 'bg-green-100 text-green-800',
-    attention: 'bg-amber-100 text-amber-800',
-    critical: 'bg-red-100 text-red-800'
-  };
-
-  const statusText = {
-    healthy: 'Sağlıklı',
-    attention: 'Kontrol Gerekli',
-    critical: 'Acil Bakım'
+  // Check if pet exists
+  if (!pet) {
+    return (
+      <div className="container mx-auto p-4 text-center">
+        <h1 className="text-2xl font-bold mb-4">Evcil Hayvan Bulunamadı</h1>
+        <p>Üzgünüz, aradığınız evcil hayvan bulunamadı.</p>
+      </div>
+    );
+  }
+  
+  // Helper function for health status badge
+  const getHealthStatusBadge = () => {
+    switch (pet.healthStatus) {
+      case "healthy":
+        return <Badge className="bg-green-500 hover:bg-green-600">Sağlıklı</Badge>;
+      case "attention":
+        return <Badge className="bg-amber-500 hover:bg-amber-600">Dikkat Gerekiyor</Badge>;
+      case "critical":
+        return <Badge className="bg-red-500 hover:bg-red-600">Kritik</Badge>;
+      default:
+        return <Badge>Bilinmiyor</Badge>;
+    }
   };
   
   return (
-    <div className="min-h-screen bg-pawcare-50/30">
-      <Navbar />
-      
-      <main className="pt-20 pb-16">
-        <div className="container px-4 py-6">
-          {/* Pet Header */}
-          <div className="bg-white rounded-xl shadow-sm border border-pawcare-100/50 overflow-hidden mb-8">
-            <div className="h-48 sm:h-64 bg-gradient-to-r from-pawcare-600 to-pawcare-400 relative overflow-hidden">
-              <div className="absolute inset-0 bg-black/20 z-10"></div>
-              
-              <div 
-                className={cn(
-                  "absolute bottom-0 left-0 right-0 p-6 z-20 flex items-end justify-between",
-                  "text-white"
-                )}
-              >
-                <div>
-                  <h1 className="text-3xl font-semibold">{pet.name}</h1>
-                  <p>{pet.breed} • {pet.age}</p>
-                </div>
-                
-                <span className={cn(
-                  "px-3 py-1 rounded-full text-sm font-medium",
-                  statusColors[pet.healthStatus]
-                )}>
-                  {statusText[pet.healthStatus]}
-                </span>
-              </div>
-              
-              <div className="absolute top-6 right-6 z-20">
-                <Button variant="outline" size="sm" className="bg-white/10 backdrop-blur-sm hover:bg-white/20 border-white/20 text-white">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Düzenle
-                </Button>
-              </div>
-            </div>
-            
-            <div className="p-6 sm:p-8 flex flex-col md:flex-row gap-8">
-              <div className="w-full md:w-1/3 lg:w-1/4">
-                <div 
-                  className={cn(
-                    "relative aspect-square overflow-hidden rounded-xl border border-pawcare-100 -mt-20 sm:-mt-28 md:-mt-16 bg-white shadow-md",
-                    "image-transition",
-                    imageLoaded ? "image-transition-loaded" : "image-transition-loading"
-                  )}
-                >
-                  <img 
-                    src={pet.imageUrl} 
-                    alt={pet.name}
-                    className="w-full h-full object-cover"
-                    onLoad={() => setImageLoaded(true)}
-                  />
-                </div>
-              </div>
-              
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
-                    <Info className="h-4 w-4" />
-                    Genel Bilgiler
-                  </h3>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <PawPrint className="h-4 w-4 text-pawcare-600" />
-                      <span className="text-sm text-muted-foreground">Tür:</span>
-                      <span className="text-sm font-medium">{pet.species}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <PawPrint className="h-4 w-4 text-pawcare-600" />
-                      <span className="text-sm text-muted-foreground">Irk:</span>
-                      <span className="text-sm font-medium">{pet.breed}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Cake className="h-4 w-4 text-pawcare-600" />
-                      <span className="text-sm text-muted-foreground">Doğum Tarihi:</span>
-                      <span className="text-sm font-medium">{pet.birthDate}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <PawPrint className="h-4 w-4 text-pawcare-600" />
-                      <span className="text-sm text-muted-foreground">Cinsiyet:</span>
-                      <span className="text-sm font-medium">{pet.gender}</span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
-                    <PawPrint className="h-4 w-4" />
-                    Fiziksel Özellikler
-                  </h3>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <Weight className="h-4 w-4 text-pawcare-600" />
-                      <span className="text-sm text-muted-foreground">Ağırlık:</span>
-                      <span className="text-sm font-medium">{pet.weight}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Ruler className="h-4 w-4 text-pawcare-600" />
-                      <span className="text-sm text-muted-foreground">Boy:</span>
-                      <span className="text-sm font-medium">{pet.height}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <PawPrint className="h-4 w-4 text-pawcare-600" />
-                      <span className="text-sm text-muted-foreground">Renk:</span>
-                      <span className="text-sm font-medium">{pet.color}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <PawPrint className="h-4 w-4 text-pawcare-600" />
-                      <span className="text-sm text-muted-foreground">Microchip:</span>
-                      <span className="text-sm font-medium">{pet.microchip}</span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
-                    <Heart className="h-4 w-4" />
-                    Sağlık Durumu
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="bg-pawcare-50 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium">Genel Sağlık</span>
-                        <span className={cn(
-                          "px-2 py-0.5 text-xs rounded-full",
-                          statusColors[pet.healthStatus]
-                        )}>
-                          {statusText[pet.healthStatus]}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Son kontrol: 15 Mayıs 2023
-                      </p>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1 flex items-center justify-center gap-1.5">
-                        <Syringe className="h-4 w-4" />
-                        <span>Aşılar</span>
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1 flex items-center justify-center gap-1.5">
-                        <FilePlus className="h-4 w-4" />
-                        <span>Kayıtlar</span>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div className="container mx-auto p-4">
+      {/* Pet Info Header */}
+      <div className="flex flex-col md:flex-row gap-6 mb-6">
+        <div className="w-full md:w-1/3 lg:w-1/4">
+          <div className="rounded-lg overflow-hidden border border-gray-200">
+            <AspectRatio ratio={1/1}>
+              <img
+                src={pet.imageUrl}
+                alt={pet.name}
+                className="w-full h-full object-cover"
+              />
+            </AspectRatio>
+          </div>
+        </div>
+        
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold">{pet.name}</h1>
+            <Button>Düzenle</Button>
           </div>
           
-          {/* Tabs for Pet Health Data */}
-          <Tabs defaultValue="timeline" className="w-full">
-            <TabsList className="bg-white border border-pawcare-100 mb-6">
-              <TabsTrigger value="timeline" className="data-[state=active]:bg-pawcare-600 data-[state=active]:text-white">
-                <Calendar className="h-4 w-4 mr-2" />
-                Zaman Çizelgesi
-              </TabsTrigger>
-              <TabsTrigger value="appointments" className="data-[state=active]:bg-pawcare-600 data-[state=active]:text-white">
-                <Calendar className="h-4 w-4 mr-2" />
-                Randevular
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="timeline" className="mt-0">
-              <div className="bg-white rounded-xl shadow-sm border border-pawcare-100/50 p-6">
-                <HealthTimeline events={petEvents} />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="appointments" className="mt-0">
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-xl font-semibold mb-4">Yaklaşan Randevular</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {petAppointments.filter(a => a.status === "upcoming").map(appointment => (
-                      <AppointmentCard key={appointment.id} {...appointment} />
-                    ))}
-                    
-                    {petAppointments.filter(a => a.status === "upcoming").length === 0 && (
-                      <div className="col-span-full bg-white rounded-xl shadow-sm border border-pawcare-100/50 p-8 text-center">
-                        <div className="mx-auto w-12 h-12 rounded-full bg-pawcare-50 flex items-center justify-center mb-3">
-                          <Calendar className="h-6 w-6 text-pawcare-400" />
-                        </div>
-                        <h3 className="text-lg font-medium mb-2">Yaklaşan Randevu Bulunamadı</h3>
-                        <p className="text-muted-foreground mb-4">
-                          {pet.name} için yeni bir randevu oluşturun.
-                        </p>
-                        <Button>
-                          <Plus className="h-4 w-4 mr-2" />
-                          Randevu Oluştur
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div>
-                  <h2 className="text-xl font-semibold mb-4">Geçmiş Randevular</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {petAppointments.filter(a => a.status === "completed").map(appointment => (
-                      <AppointmentCard key={appointment.id} {...appointment} />
-                    ))}
-                    
-                    {petAppointments.filter(a => a.status === "completed").length === 0 && (
-                      <div className="col-span-full bg-white rounded-xl shadow-sm border border-pawcare-100/50 p-8 text-center">
-                        <div className="mx-auto w-12 h-12 rounded-full bg-pawcare-50 flex items-center justify-center mb-3">
-                          <Calendar className="h-6 w-6 text-pawcare-400" />
-                        </div>
-                        <h3 className="text-lg font-medium">Geçmiş Randevu Bulunamadı</h3>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <div className="flex items-center gap-2 mb-4">
+            {getHealthStatusBadge()}
+            {pet.upcomingVaccines > 0 && (
+              <Badge variant="outline" className="border-amber-500 text-amber-700">
+                {pet.upcomingVaccines} Yaklaşan Aşı
+              </Badge>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6">
+            <div>
+              <p className="text-sm text-muted-foreground">Tür</p>
+              <p className="font-medium">{pet.species}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Irk</p>
+              <p className="font-medium">{pet.breed}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Yaş</p>
+              <p className="font-medium">{pet.age}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Cinsiyet</p>
+              <p className="font-medium">{pet.gender}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Ağırlık</p>
+              <p className="font-medium">{pet.weight}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Renk</p>
+              <p className="font-medium">{pet.color}</p>
+            </div>
+          </div>
         </div>
-      </main>
+      </div>
       
-      <Footer />
+      {/* Tab Navigation */}
+      <Tabs defaultValue="overview" onValueChange={setActiveTab} className="mb-6">
+        <TabsList className="w-full justify-start">
+          <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
+          <TabsTrigger value="health">Sağlık Kaydı</TabsTrigger>
+          <TabsTrigger value="appointments">Randevular</TabsTrigger>
+          <TabsTrigger value="documents">Belgeler</TabsTrigger>
+        </TabsList>
+      </Tabs>
+      
+      {/* Tab Content */}
+      <div className="space-y-8">
+        {activeTab === "overview" && (
+          <>
+            {/* More Details Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Detaylı Bilgiler</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6">
+                <div>
+                  <p className="text-sm text-muted-foreground">Doğum Tarihi</p>
+                  <p className="font-medium">{pet.birthdate}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Mikroçip Numarası</p>
+                  <p className="font-medium">{pet.microchipNumber}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Kısırlaştırma</p>
+                  <p className="font-medium">{pet.sterilized ? "Evet" : "Hayır"}</p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Next Appointment */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Yaklaşan Randevu</h2>
+                <Button variant="outline" size="sm" className="gap-1">
+                  <Plus className="w-4 h-4" />
+                  <span>Randevu Ekle</span>
+                </Button>
+              </div>
+              
+              {petAppointments.filter(a => a.isNext).length > 0 ? (
+                petAppointments
+                  .filter(a => a.isNext)
+                  .map(appointment => (
+                    <AppointmentCard key={appointment.id} {...appointment} />
+                  ))
+              ) : (
+                <p className="text-muted-foreground">Yaklaşan randevu bulunmamaktadır.</p>
+              )}
+            </div>
+            
+            {/* Health Timeline */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Sağlık Zaman Çizelgesi</h2>
+                <Button variant="outline" size="sm">Tümünü Gör</Button>
+              </div>
+              
+              <HealthTimeline events={sampleTimelineEvents as any} limit={3} />
+            </div>
+          </>
+        )}
+        
+        {activeTab === "health" && (
+          <>
+            <HealthTimeline events={sampleTimelineEvents as any} />
+            
+            {/* Additional health records would go here */}
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">Sağlık Kayıtları</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Laboratuvar Sonuçları</CardTitle>
+                    <CardDescription>En son güncelleme: 15 Mayıs 2023</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">Tüm değerler normal sınırlar içinde</p>
+                    <Button variant="outline" size="sm" className="mt-4">Detayları Gör</Button>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Aşılar</CardTitle>
+                    <CardDescription>En son güncelleme: 12 Haziran 2023</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      <span className="font-medium">2</span> aşı tamamlandı, 
+                      <span className="font-medium"> 1</span> yaklaşan aşı
+                    </p>
+                    <Button variant="outline" size="sm" className="mt-4">Detayları Gör</Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </>
+        )}
+        
+        {activeTab === "appointments" && (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Tüm Randevular</h2>
+              <Button variant="outline" size="sm" className="gap-1">
+                <Plus className="w-4 h-4" />
+                <span>Randevu Ekle</span>
+              </Button>
+            </div>
+            
+            {petAppointments.length > 0 ? (
+              <div className="space-y-4">
+                {petAppointments.map(appointment => (
+                  <AppointmentCard key={appointment.id} {...appointment} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground">Randevu bulunmamaktadır.</p>
+            )}
+          </>
+        )}
+        
+        {activeTab === "documents" && (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Belgeler</h2>
+              <Button variant="outline" size="sm" className="gap-1">
+                <Plus className="w-4 h-4" />
+                <span>Belge Ekle</span>
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Aşı Kartı</CardTitle>
+                  <CardDescription>Ekleme Tarihi: 12 Haziran 2023</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" size="sm">İndir</Button>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Mikroçip Belgesi</CardTitle>
+                  <CardDescription>Ekleme Tarihi: 10 Mayıs 2020</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" size="sm">İndir</Button>
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
