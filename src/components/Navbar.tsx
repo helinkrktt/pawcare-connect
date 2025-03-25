@@ -58,7 +58,12 @@ export function Navbar() {
           <NavLink to="/appointments" className={({isActive}) => cn('nav-link', isActive && 'active')}>
             Randevular
           </NavLink>
-          <Button variant="default" size="sm" className="btn-shine ml-4">
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="btn-shine ml-4"
+            onClick={() => window.location.href = '/login'}
+          >
             Giriş Yap
           </Button>
         </nav>
@@ -128,7 +133,15 @@ export function Navbar() {
           >
             Randevular
           </NavLink>
-          <Button variant="default" size="lg" className="w-full mt-4">
+          <Button 
+            variant="default" 
+            size="lg" 
+            className="w-full mt-4"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              window.location.href = '/login';
+            }}
+          >
             Giriş Yap
           </Button>
         </nav>

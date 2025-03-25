@@ -10,6 +10,9 @@ import Dashboard from "./pages/Dashboard";
 import Health from "./pages/Health";
 import Appointments from "./pages/Appointments";
 import PetProfile from "./pages/PetProfile";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +28,9 @@ const App = () => (
           <Route path="/health" element={<Health />} />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/pet/:id" element={<PetProfile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
