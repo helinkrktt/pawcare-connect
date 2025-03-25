@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -48,11 +49,11 @@ export function Hero() {
         </p>
         
         <div data-animate className="opacity-0 translate-y-4 flex flex-col sm:flex-row gap-4 justify-center">
-          <Button className="btn-shine text-base h-12 px-8 rounded-xl" size="lg">
-            Hemen Başla
+          <Button asChild className="btn-shine text-base h-12 px-8 rounded-xl" size="lg">
+            <Link to="/get-started">Hemen Başla</Link>
           </Button>
-          <Button variant="outline" className="text-base h-12 px-8 rounded-xl" size="lg">
-            Daha Fazla Bilgi
+          <Button asChild variant="outline" className="text-base h-12 px-8 rounded-xl" size="lg">
+            <Link to="/faq">Daha Fazla Bilgi</Link>
           </Button>
         </div>
       </div>

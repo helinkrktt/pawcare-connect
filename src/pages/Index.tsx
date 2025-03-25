@@ -201,11 +201,11 @@ const Index = () => {
               PawCare ile evcil hayvanlarınızın sağlığını takip etmeye hazır mısınız?
             </h2>
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
-              <Button className="h-12 px-8 text-base" size="lg">
-                Hemen Başla
+              <Button asChild className="h-12 px-8 text-base" size="lg">
+                <Link to="/get-started">Hemen Başla</Link>
               </Button>
-              <Button variant="outline" className="h-12 px-8 text-base" size="lg">
-                Demo Videoyu İzle
+              <Button asChild variant="outline" className="h-12 px-8 text-base" size="lg">
+                <Link to="/faq">Demo Videoyu İzle</Link>
               </Button>
             </div>
           </div>
