@@ -35,10 +35,13 @@ export function Navbar() {
       <div className="container flex items-center justify-between">
         <Link 
           to="/" 
-          className="flex items-center gap-2 text-xl font-semibold text-foreground"
+          className="flex items-center gap-3 text-2xl font-bold text-foreground group"
         >
-          <PawPrint className="h-7 w-7 text-pawcare-600" />
-          <span className="hidden md:inline">PawCare</span>
+          <div className="relative transition-all duration-300 group-hover:scale-110">
+            <PawPrint className="h-10 w-10 text-pawcare-600" strokeWidth={2.5} />
+            <div className="absolute inset-0 bg-pawcare-500/20 rounded-full blur-lg -z-10 opacity-70 group-hover:opacity-100"></div>
+          </div>
+          <span className="hidden md:inline bg-gradient-to-r from-pawcare-600 to-pawcare-500 bg-clip-text text-transparent">PawCare</span>
         </Link>
 
         {/* Desktop Navigation */}

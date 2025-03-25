@@ -1,4 +1,3 @@
-
 import { PawPrint } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -12,10 +11,13 @@ export function Footer() {
           <div className="max-w-xs">
             <Link 
               to="/" 
-              className="flex items-center gap-2 text-xl font-semibold text-foreground mb-4"
+              className="flex items-center gap-3 text-2xl font-bold text-foreground mb-4 group"
             >
-              <PawPrint className="h-7 w-7 text-pawcare-600" />
-              <span>PawCare</span>
+              <div className="relative transition-all duration-300 group-hover:scale-110">
+                <PawPrint className="h-9 w-9 text-pawcare-600" strokeWidth={2.5} />
+                <div className="absolute inset-0 bg-pawcare-500/20 rounded-full blur-lg -z-10 opacity-70 group-hover:opacity-100"></div>
+              </div>
+              <span className="bg-gradient-to-r from-pawcare-600 to-pawcare-500 bg-clip-text text-transparent">PawCare</span>
             </Link>
             <p className="text-muted-foreground text-sm mb-4">
               Evcil hayvanlarınızın sağlık takibi için modern, güvenilir ve kullanımı kolay platform.
